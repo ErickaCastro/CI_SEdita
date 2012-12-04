@@ -43,6 +43,7 @@ class clsLogin
     var $_user = "";
     var $_clave = "";
     var $_name = "";
+    var $_tipoUser = "";
     var $_auth = false;
  
     /**
@@ -74,6 +75,7 @@ class clsLogin
                 $this->_nick = $CI->session->userdata('user');
                 $this->_clave = $CI->session->userdata('clave');
                 $this->_name = $CI->session->userdata('name');
+                $this->_tipoUser = $CI->session->userdata('tipoUser');
                 $this->_auth = true;
             }
         }
@@ -116,6 +118,14 @@ class clsLogin
         return $this->_name;
     }
     /**
+     * getTipoUser() retorna el nombre del usuario
+     * @return string _tipoUser
+     */
+    function getTipoUser()
+    {
+        return $this->_tipoUser;
+    }
+    /**
      * login($user = "", $clave = "")
      * La función de login recibirá dos parámetros: usuario y contraseña que normalmente serán 
      * los que el usuario nos introduzca mediante un formulario. Pero también se usará para
@@ -141,31 +151,41 @@ class clsLogin
     {
         if (empty($user) || empty($clave))
             return false;
+        
         $CI = &get_instance();
-        $sql = "SELECT adm_id,adm_nombre FROM tbl_administrador WHERE adm_user=? AND adm_clave=?"; 
+        
+        $sql = "SELECT usu_personal_id, usu_nombre, usu_tipo
+                FROM usuario
+                WHERE usu_nombre=? AND usu_clave=?";
+        
         $query = $CI->db->query($sql, array(strtolower($user), strtolower($clave)));
+        
         if ($query->num_rows() == 1) {
             //para retornar un solo resultado
             $row = $query->row();
-            $this->_id = $row->adm_id;
+            $this->_id = $row->usu_personal_id;
             $this->_user = $user;
             $this->_clave = $clave;
-            $this->_name = $row->adm_nombre;
+            $this->_name = $row->usu_nombre;
+            $this->_tipoUser = $row->usu_tipo;
             $this->_auth = true;
             //si lo guardo asi solo hago una sola update no uno x uno en la BD
             $info_session = array('id' => $this->_id, 'user' => $user, 'clave' => $clave,
-                'name' => $this->_name);
+                'name' => $this->_name, 'tipoUser' => $this->_tipoUser);
             $CI->session->set_userdata($info_session);
             return true;
-        } else {
+        } 
+        else {
             $this->_auth = false;
             $this->logout();
             return false;
         }
+        
         $query->free_result();
         $query->close();
         $CI->db->close();
     } //funcion login
+    
     /**
      * logout()
      * Esta función simple y llanamente destruirá las variables session.
@@ -180,6 +200,7 @@ class clsLogin
         $this->_user = "";
         $this->_clave = "";
         $this->_name = "";
+        $this->_tipoUser = "";
     } //logout
     /**
      * Check()
