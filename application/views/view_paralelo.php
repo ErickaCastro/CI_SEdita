@@ -1,0 +1,1 @@
+Paralelo: <input type="text" name="paralelo" id="paralelo"/>

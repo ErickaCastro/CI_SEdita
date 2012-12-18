@@ -14,7 +14,7 @@
             
                 if ($this->form_validation->run() == false) {
                     $data["error"]="";
-                    $this->load->view("view_plantilla", $data);
+                    $this->load->view("view_login", $data);
                 }
 				else{
                     $u = $this->input->post("txtUser");
@@ -44,7 +44,7 @@
         }
         
         function _login($data){
-            $this->load->view("view_plantilla", $data);
+            $this->load->view("view_login", $data);
         }
         
      }
